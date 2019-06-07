@@ -1,0 +1,38 @@
+{
+	"name" : "phpmv/ubiquity-swoole",
+	"description" : "swoole extension for Ubiquity framework",
+	"type" : "extension",
+	"keywords" : [
+		"php",
+		"framework",
+		"mvc",
+		"orm",
+		"server",
+		"swoole"
+	],
+	"require" : {
+		"php" : ">7.0",
+		"phpmv/ubiquity": "dev-master",
+		"upscale/swoole-session": "^1.0"
+	},
+	"license" : "Apache-2.0",
+	"authors" : [{
+			"name" : "Jean-Christophe HERON",
+			"email" : "myaddressmail@gmail.com",
+			"role" : "Lead developer"
+		}
+	],
+	"autoload" : {
+		"psr-4" : {
+			"Ubiquity\\" : "src/Ubiquity/"
+		}
+	},
+	"extra" : {
+		"branch-alias" : {
+			"dev-master" : "1.0.x-dev"
+		}
+	},
+	"require-dev" : {
+		"swoole/ide-helper": "~4.3.3"
+	}
+}
