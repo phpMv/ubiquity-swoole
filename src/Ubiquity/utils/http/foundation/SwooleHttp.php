@@ -60,7 +60,7 @@ class SwooleHttp extends AbstractHttp {
 				$this->headers[$k] = $header;
 			}
 		}
-		$this->response->header = $this->response->header + $this->headers;
+		$this->response->header = $this->headers;
 	}
 
 	/**
@@ -94,7 +94,12 @@ class SwooleHttp extends AbstractHttp {
 			'Content-Type' => 'text/html; charset=utf-8',
 			'Server' => $request->request['Server'] ?? 'Swoole'
 		];
-		$this->setHeaders(array_merge($default, $response->header));
+		if (is_array($response->header)) {
+			$headers = (array_merge($default, $response->header));
+		} else {
+			$headers = $default;
+		}
+		$this->setHeaders($headers);
 	}
 }
 
