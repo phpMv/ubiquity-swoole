@@ -1,5 +1,5 @@
 <?php
-namespace Ubiquity\servers;
+namespace Ubiquity\servers\swoole;
 
 use Swoole\Http\Server;
 use Swoole\Http\Request;
