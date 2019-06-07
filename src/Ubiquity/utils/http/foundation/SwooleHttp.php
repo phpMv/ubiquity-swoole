@@ -12,7 +12,7 @@ namespace Ubiquity\utils\http\foundation;
  */
 class SwooleHttp extends AbstractHttp {
 
-	private $headers;
+	private $headers = [];
 
 	private $responseCode = 200;
 
