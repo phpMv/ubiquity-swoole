@@ -42,7 +42,7 @@ class SwooleServer {
 	protected function handle(Request $request, Response $response) {
 		$request->get['c'] = '';
 		$response->status(200);
-		$uri = ltrim(urldecode(parse_url($request->server['REQUEST_URI'], PHP_URL_PATH)), '/');
+		$uri = ltrim(urldecode(parse_url($request->server['request_uri'], PHP_URL_PATH)), '/');
 		if ($uri == null || ! file_exists($this->basedir . '/../' . $uri)) {
 			$request->get['c'] = $uri;
 		} else {
