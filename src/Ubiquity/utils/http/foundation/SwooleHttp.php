@@ -94,7 +94,7 @@ class SwooleHttp extends AbstractHttp {
 			'Content-Type' => 'text/html; charset=utf-8',
 			'Server' => $request->request['Server'] ?? 'Swoole'
 		];
-		$this->setHeaders(array_merge($default, $response->getHeaders()));
+		$this->setHeaders(array_merge($default, $response->header));
 	}
 }
 
