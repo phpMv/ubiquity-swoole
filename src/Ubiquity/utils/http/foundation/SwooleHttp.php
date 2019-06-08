@@ -54,15 +54,16 @@ class SwooleHttp extends AbstractHttp {
 	 * @param mixed $headers
 	 */
 	private function setHeaders($headers) {
-		foreach ($headers as $k => $header) {
-			$k = strtolower($k);
-			if (is_array($header) && sizeof($header) == 1) {
-				$this->headers[$k] = current($header);
-			} else {
-				$this->headers[$k] = $header;
-			}
-		}
-		$this->response->header = $this->headers;
+		/*
+		 * foreach ($headers as $k => $header) {
+		 * if (is_array($header) && sizeof($header) == 1) {
+		 * $this->headers[$k] = current($header);
+		 * } else {
+		 * $this->headers[$k] = $header;
+		 * }
+		 * }
+		 */
+		$this->response->header = $headers;
 	}
 
 	/**
