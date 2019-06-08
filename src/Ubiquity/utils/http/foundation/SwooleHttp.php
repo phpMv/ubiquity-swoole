@@ -101,8 +101,8 @@ class SwooleHttp extends AbstractHttp {
 		$this->response = $response;
 		$this->request = $request;
 		$default = [
-			'content-type' => $this->getValue($request->header['accept'], 'text/html'),
-			'server' => $request->request['server'] ?? 'Swoole'
+			'Content-Type' => $this->getValue($request->header['accept'], 'text/html'),
+			'Server' => $request->request['server'] ?? 'Swoole'
 		];
 		if (is_array($response->header)) {
 			$headers = (array_merge($default, $response->header));
