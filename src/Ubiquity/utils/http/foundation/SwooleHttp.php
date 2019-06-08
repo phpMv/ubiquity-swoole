@@ -36,6 +36,7 @@ class SwooleHttp extends AbstractHttp {
 		$this->headers[$key] = $value;
 		if ($http_response_code != null) {
 			$this->responseCode = $http_response_code;
+			$this->response->status($http_response_code);
 		}
 		$this->response->header($key, $value);
 	}
@@ -91,7 +92,7 @@ class SwooleHttp extends AbstractHttp {
 		$this->response = $response;
 		$this->request = $request;
 		$default = [
-			'Content-Type' => 'text/html; charset=utf-8',
+			'Content-Type' => current($request->header['accept']),
 			'Server' => $request->request['Server'] ?? 'Swoole'
 		];
 		if (is_array($response->header)) {
