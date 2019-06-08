@@ -5,6 +5,7 @@ use Swoole\Http\Server;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Ubiquity\utils\http\foundation\SwooleHttp;
+use Swoole\Process;
 
 class SwooleServer {
 
@@ -43,9 +44,15 @@ class SwooleServer {
 		$http->on("request", function (Request $request, Response $response) {
 			$this->handle($request, $response);
 		});
-		$http->tick(15000, function () {
-			\pcntl_signal_dispatch();
-		});
+		$http->set([
+			'daemonize' => true
+		]);
+		$http->addProcess(new Process(function () {
+			while (true) {
+				pcntl_signal_dispatch();
+				sleep(10);
+			}
+		}));
 		$this->server = $http;
 		$http->start();
 	}
