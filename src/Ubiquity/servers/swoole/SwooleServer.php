@@ -43,13 +43,8 @@ class SwooleServer {
 
 		$http->on("request", function (Request $request, Response $response) {
 			$this->handle($request, $response);
+			pcntl_signal_dispatch();
 		});
-		$http->addProcess(new Process(function () {
-			while (true) {
-				pcntl_signal_dispatch();
-				sleep(10);
-			}
-		}));
 		$this->server = $http;
 		$http->start();
 	}
