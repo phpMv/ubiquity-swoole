@@ -88,7 +88,7 @@ class SwooleServer {
 
 	public function setOptions($options = []) {
 		$default = [
-			'pid_file' => '/var/run/swoole_server.pid',
+			'pid_file' => __DIR__ . '/server.pid',
 			'daemonize' => true
 		];
 		if (is_array($options)) {
@@ -120,11 +120,14 @@ class SwooleServer {
 	 * @throws \Exception
 	 */
 	public function stop(): bool {
-		$kill = Process::kill($this->getPid());
-		if (! $kill) {
-			throw new \Exception("Swoole server not stopped!");
+		$pid = $this->getPid();
+		if ($pid !== 0) {
+			$kill = Process::kill($pid);
+			if (! $kill) {
+				throw new \Exception("Swoole server not stopped!");
+			}
+			return $kill;
 		}
-		return $kill;
 	}
 
 	protected function handle(Request $request, Response $response) {
