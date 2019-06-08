@@ -54,23 +54,14 @@ class SwooleHttp extends AbstractHttp {
 	 * @param mixed $headers
 	 */
 	private function setHeaders($headers) {
-		/*
-		 * foreach ($headers as $k => $header) {
-		 * if (is_array($header) && sizeof($header) == 1) {
-		 * $this->headers[$k] = current($header);
-		 * } else {
-		 * $this->headers[$k] = $header;
-		 * }
-		 * }
-		 */
-		$this->response->header = $headers;
-	}
-
-	private function getValue($element, $default = '') {
-		if (is_array($element)) {
-			return \current($element) ?? $default;
+		foreach ($headers as $k => $header) {
+			if (is_array($header) && sizeof($header) == 1) {
+				$this->headers[$k] = current($header);
+			} else {
+				$this->headers[$k] = $header;
+			}
 		}
-		return $element ?? $default;
+		$this->response->header = $this->headers;
 	}
 
 	/**
@@ -92,6 +83,13 @@ class SwooleHttp extends AbstractHttp {
 		return $this->request->getData();
 	}
 
+	private function getFirstValue($elements) {
+		if (is_array($elements)) {
+			return current($elements);
+		}
+		return $elements;
+	}
+
 	/**
 	 *
 	 * @param \Swoole\Http\Request $request
@@ -101,10 +99,9 @@ class SwooleHttp extends AbstractHttp {
 		$this->response = $response;
 		$this->request = $request;
 		$default = [
-			'Content-Type' => $this->getValue($request->header['accept'], 'text/html'),
+			'Content-Type' => $this->getFirstValue($request->header['accept']) ?? 'text/html',
 			'Server' => $request->request['server'] ?? 'Swoole'
 		];
-
 		if (is_array($response->header)) {
 			$headers = (array_merge($default, $response->header));
 		} else {
