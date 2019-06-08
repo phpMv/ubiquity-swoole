@@ -137,7 +137,7 @@ class SwooleServer {
 		if ($uri == null || ! file_exists($this->basedir . '/../' . $uri)) {
 			$request->get['c'] = $uri;
 		} else {
-			$response->header('Content-Type', $request->header['accept'] ?? 'text/html');
+			$response->header('Content-Type', $request->header['accept'] ?? 'text/html; charset=utf-8');
 			$response->end(file_get_contents($this->basedir . '/../' . $uri));
 			return;
 		}

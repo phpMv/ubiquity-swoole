@@ -99,7 +99,7 @@ class SwooleHttp extends AbstractHttp {
 		$this->response = $response;
 		$this->request = $request;
 		$default = [
-			'Content-Type' => 'text/html',
+			'Content-Type' => 'text/html; charset=utf-8',
 			'Server' => $request->request['server'] ?? 'Swoole'
 		];
 		if (is_array($response->header)) {
