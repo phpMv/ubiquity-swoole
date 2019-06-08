@@ -44,9 +44,6 @@ class SwooleServer {
 		$http->on("request", function (Request $request, Response $response) {
 			$this->handle($request, $response);
 		});
-		$http->set([
-			'daemonize' => true
-		]);
 		$http->addProcess(new Process(function () {
 			while (true) {
 				pcntl_signal_dispatch();
