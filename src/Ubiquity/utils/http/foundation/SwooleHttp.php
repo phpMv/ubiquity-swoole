@@ -55,6 +55,7 @@ class SwooleHttp extends AbstractHttp {
 	 */
 	private function setHeaders($headers) {
 		foreach ($headers as $k => $header) {
+			$k = strtolower($k);
 			if (is_array($header) && sizeof($header) == 1) {
 				$this->headers[$k] = current($header);
 			} else {
