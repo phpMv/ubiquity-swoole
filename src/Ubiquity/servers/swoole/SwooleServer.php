@@ -21,32 +21,110 @@ class SwooleServer {
 
 	private $basedir;
 
+	private $options;
+
+	/**
+	 *
+	 * @return int
+	 */
+	private function getPid(): int {
+		$file = $this->getPidFile();
+		if (! \file_exists($file)) {
+			return 0;
+		}
+		$pid = (int) \file_get_contents($file);
+		if (! $pid) {
+			$this->removePidFile();
+			return 0;
+		}
+		return $pid;
+	}
+
+	/**
+	 * Get pid file.
+	 *
+	 * @return string
+	 */
+	private function getPidFile(): string {
+		return $this->getOption('pid_file');
+	}
+
+	/**
+	 * Remove the pid file.
+	 */
+	private function removePidFile(): void {
+		$file = $this->getPidFile();
+		if (\file_exists($file)) {
+			\unlink($file);
+		}
+	}
+
+	/**
+	 * Configure the created server.
+	 */
+	private function configure($http) {
+		$http->set($this->options);
+	}
+
 	public function init($config, $basedir) {
 		$this->config = $config;
 		$this->basedir = $basedir;
 		$this->httpInstance = new SwooleHttp();
-		\pcntl_signal(\SIGTERM, [
-			$this,
-			'stop'
-		]);
-		\pcntl_signal(\SIGINT, [
-			$this,
-			'stop'
-		]);
 	}
 
-	public function run($host, $port) {
+	/**
+	 * Get swoole configuration option value.
+	 *
+	 * @param string $key
+	 * @return mixed
+	 */
+	public function getOption(string $key) {
+		$option = $this->options[$key];
+		if (! $option) {
+			throw new \InvalidArgumentException(sprintf('Parameter not found: %s', $key));
+		}
+		return $option;
+	}
+
+	public function setOptions($options = []) {
+		$default = [
+			'pid_file' => '/var/run/swoole_server.pid',
+			'daemonize' => true
+		];
+		if (is_array($options)) {
+			$this->options = $default + $options;
+		} else {
+			$this->options = $default;
+		}
+	}
+
+	public function run($host, $port, $options = null) {
 		$http = new Server($host, $port);
+		$this->setOptions($options);
+		$this->configure($http);
 		$http->on('start', function ($server) use ($host, $port) {
 			echo "Ubiquity-Swoole http server is started at {$host}:{$port}\n";
 		});
 
 		$http->on("request", function (Request $request, Response $response) {
 			$this->handle($request, $response);
-			pcntl_signal_dispatch();
 		});
 		$this->server = $http;
 		$http->start();
+	}
+
+	/**
+	 * Stop the swoole server.
+	 *
+	 * @return bool
+	 * @throws \Exception
+	 */
+	public function stop(): bool {
+		$kill = Process::kill($this->getPid());
+		if (! $kill) {
+			throw new \Exception("Swoole server not stopped!");
+		}
+		return $kill;
 	}
 
 	protected function handle(Request $request, Response $response) {
@@ -83,10 +161,6 @@ class SwooleServer {
 		$_POST = $request->post ?? [];
 		$_COOKIE = $request->cookie ?? [];
 		$_FILES = $request->files ?? [];
-	}
-
-	public function stop() {
-		$this->server->shutdown();
 	}
 }
 
