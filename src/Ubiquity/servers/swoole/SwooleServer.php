@@ -24,6 +24,14 @@ class SwooleServer {
 		$this->config = $config;
 		$this->basedir = $basedir;
 		$this->httpInstance = new SwooleHttp();
+		\pcntl_signal(\SIGTERM, [
+			$this,
+			'stop'
+		]);
+		\pcntl_signal(\SIGINT, [
+			$this,
+			'stop'
+		]);
 	}
 
 	public function run($host, $port) {
@@ -34,8 +42,9 @@ class SwooleServer {
 
 		$http->on("request", function (Request $request, Response $response) {
 			$this->handle($request, $response);
+			\pcntl_signal_dispatch();
 		});
-
+		$this->server = $http;
 		$http->start();
 	}
 
@@ -73,6 +82,11 @@ class SwooleServer {
 		$_POST = $request->post ?? [];
 		$_COOKIE = $request->cookie ?? [];
 		$_FILES = $request->files ?? [];
+	}
+
+	public function stop() {
+		$this->server->shutdown();
+		echo "Ubiquity-Swoole http stopping\n";
 	}
 }
 
