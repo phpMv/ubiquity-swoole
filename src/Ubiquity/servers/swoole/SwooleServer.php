@@ -42,6 +42,8 @@ class SwooleServer {
 
 		$http->on("request", function (Request $request, Response $response) {
 			$this->handle($request, $response);
+		});
+		$http->tick(15000, function () {
 			\pcntl_signal_dispatch();
 		});
 		$this->server = $http;
@@ -86,7 +88,6 @@ class SwooleServer {
 
 	public function stop() {
 		$this->server->shutdown();
-		echo "Ubiquity-Swoole http stopping\n";
 	}
 }
 
