@@ -87,9 +87,8 @@ class SwooleServer {
 	}
 
 	public function setOptions($options = []) {
-		$default = [
-			'pid_file' => __DIR__ . '/server.pid',
-			'daemonize' => true
+		$default = [ // 'pid_file' => __DIR__ . '/server.pid',
+		// 'daemonize' => true
 		];
 		if (is_array($options)) {
 			$this->options = $default + $options;
