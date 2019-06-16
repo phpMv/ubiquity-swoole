@@ -87,8 +87,29 @@ class SwooleServer {
 	}
 
 	public function setOptions($options = []) {
-		$default = [ // 'pid_file' => __DIR__ . '/server.pid',
-		// 'daemonize' => true
+		$default = [
+			'daemonize' => false,
+			'dispatch_mode' => 2,
+			'reactor_num' => function_exists('swoole_cpu_num') ? swoole_cpu_num() * 2 : 4,
+			'worker_num' => function_exists('swoole_cpu_num') ? swoole_cpu_num() * 2 : 8,
+			'task_ipc_mode' => 1,
+			'task_max_request' => 8000,
+			'task_tmpdir' => @is_writable('/dev/shm/') ? '/dev/shm' : '/tmp',
+			'max_request' => 8000,
+			'open_tcp_nodelay' => true,
+			'pid_file' => __DIR__ . '/server.pid',
+			// 'log_file' => __DIR__ . '/swoole.log',
+			'log_level' => 5,
+			'document_root' => base_path(),
+			'buffer_output_size' => 2 * 1024 * 1024,
+			'socket_buffer_size' => 128 * 1024 * 1024,
+			'package_max_length' => 4 * 1024 * 1024,
+			'reload_async' => true,
+			'max_wait_time' => 60,
+			'enable_reuse_port' => true,
+			'enable_coroutine' => false,
+			'http_compression' => false
+			// 'daemonize' => true
 		];
 		if (is_array($options)) {
 			$this->options = $default + $options;
