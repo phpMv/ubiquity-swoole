@@ -100,7 +100,6 @@ class SwooleServer {
 			'pid_file' => __DIR__ . '/server.pid',
 			// 'log_file' => __DIR__ . '/swoole.log',
 			'log_level' => 5,
-			'document_root' => base_path(),
 			'buffer_output_size' => 2 * 1024 * 1024,
 			'socket_buffer_size' => 128 * 1024 * 1024,
 			'package_max_length' => 4 * 1024 * 1024,
