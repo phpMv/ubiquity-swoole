@@ -89,6 +89,10 @@ class SwooleStatement {
 		return $this->resultSet;
 	}
 	
+	public function fetchAll(){
+		return $this->resultSet;
+	}
+	
 	public function fetchColumn($columnNumber=0){
 		return \array_column(\is_numeric($columnNumber) ? $this->getBoth() : $this->resultSet,
 			$columnNumber);

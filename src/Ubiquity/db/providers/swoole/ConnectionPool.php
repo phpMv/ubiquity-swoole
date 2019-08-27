@@ -28,7 +28,6 @@ class ConnectionPool{
 		$this->pool->enqueue($db);
 		$this->pool_count++;
 	}
-
 	public function get(){
 		if ($this->pool_count > 0) {
 			$this->pool_count--;

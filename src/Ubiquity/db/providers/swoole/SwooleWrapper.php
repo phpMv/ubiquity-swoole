@@ -5,14 +5,14 @@ use Ubiquity\db\providers\AbstractDbWrapper;
 use Swoole\Coroutine\MySQL\Statement;
 
 /**
- * Ubiquity\db\providers\swoole$DbSwooleWrapper
+ * Ubiquity\db\providers\swoole$SwooleWrapper
  * This class is part of Ubiquity
  * @author jcheron <myaddressmail@gmail.com>
  * @version 1.0.0
  * @property \Swoole\Coroutine\MySQL $dbIntance
  *
  */
-class DbSwooleWrapper extends AbstractDbWrapper {
+class SwooleWrapper extends AbstractDbWrapper {
 	
 	/**
 	 * @var ConnectionPool
@@ -95,7 +95,7 @@ class DbSwooleWrapper extends AbstractDbWrapper {
 
 	public function fetchAll(Statement $statement, array $values = null, $mode = null) {
 		if ($statement->execute($values)){
-			return $statement->fetchAll();
+			return $statement->get_result();
 		}
 		return false;
 	}
