@@ -20,10 +20,10 @@ class ConnectionPool{
 	
 	public function __construct($dbType,$host,$port,$user,$password,$database){
 		$this->pool = new \SplQueue;
-		$this->server=['host'=>$host,''=>$port,'user'=>$user,'$password'=>$password,'database'=>$database]+$this->server;
+		$this->server=['host'=>$host,'port'=>$port,'user'=>$user,'password'=>$password,'database'=>$database]+$this->server;
 		$this->dbClass=self::DB_TYPES[$dbType]??'Swoole\Coroutine\MySQL';
 	}
-
+	
 	public function put($db){
 		$this->pool->enqueue($db);
 		$this->pool_count++;

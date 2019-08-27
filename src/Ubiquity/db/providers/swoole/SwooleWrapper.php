@@ -2,7 +2,6 @@
 namespace Ubiquity\db\providers\swoole;
 
 use Ubiquity\db\providers\AbstractDbWrapper;
-use Swoole\Coroutine\MySQL\Statement;
 
 /**
  * Ubiquity\db\providers\swoole$SwooleWrapper
@@ -69,7 +68,7 @@ class SwooleWrapper extends AbstractDbWrapper {
 		return false;
 	}
 
-	public function getAvailableDrivers() {
+	public static function getAvailableDrivers() {
 		return ['mysql'];
 	}
 
@@ -85,7 +84,8 @@ class SwooleWrapper extends AbstractDbWrapper {
 	}
 
 	public function connect($dbType, $dbName, $serverName, $port, $user, $password, array $options) {
-		$this->connectionPool=new ConnectionPool($dbType, $serverName,$port, $user, $password, $dbName);
+		//$this->connectionPool=new ConnectionPool($dbType, $serverName,$port, $user, $password, $dbName);
+		$this->connectionPool=\Ubiquity\controllers\Startup::$pool;
 		$this->dbInstance=$this->connectionPool->get();
 	}
 
@@ -93,7 +93,7 @@ class SwooleWrapper extends AbstractDbWrapper {
 		return $this->inTransaction;
 	}
 
-	public function fetchAll(Statement $statement, array $values = null, $mode = null) {
+	public function fetchAll($statement, array $values = null, $mode = null) {
 		if ($statement->execute($values)){
 			return $statement->get_result();
 		}
