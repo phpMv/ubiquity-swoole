@@ -84,9 +84,6 @@ class SwooleWrapper extends AbstractDbWrapper {
 	}
 
 	public function connect($dbType, $dbName, $serverName, $port, $user, $password, array $options) {
-		if(!isset($this->dbInstance)){
-			$this->dbInstance=$this->connectionPool->get();
-		}
 	}
 
 	public function inTransaction() {
