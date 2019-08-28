@@ -3,9 +3,8 @@ namespace Ubiquity\orm;
 
 use Ubiquity\db\SqlUtils;
 use Ubiquity\controllers\Startup;
-use Ubiquity\db\providers\swoole\SwooleWrapper;
-use Ubiquity\db\Database;
 use Ubiquity\db\providers\swoole\ConnectionPool;
+use Ubiquity\db\SwooleDatabase;
 
 class SwooleDAO extends DAO {
 	/**
@@ -42,8 +41,7 @@ class SwooleDAO extends DAO {
 		$db = $offset ? ($config ['database'] [$offset] ?? ($config ['database'] ?? [ ])) : ($config ['database'] ['default'] ?? $config ['database']);
 		if ($db ['dbName'] !== '') {
 			$uid=self::uid();
-			self::$db [$offset][$uid] = new Database( SwooleWrapper::class, $db ['type'], $db ['dbName'], $db ['serverName'] ?? '127.0.0.1', $db ['port'] ?? 3306, $db ['user'] ?? 'root', $db ['password'] ?? '', $db ['options'] ?? [ ], $db ['cache'] ?? false );
-			self::$db [$offset][$uid]->setPool(self::$pool);
+			self::$db [$offset][$uid] = new SwooleDatabase( $uid,self::$pool, $db ['type'], $db ['dbName'], $db ['serverName'] ?? '127.0.0.1', $db ['port'] ?? 3306, $db ['user'] ?? 'root', $db ['password'] ?? '', $db ['options'] ?? [ ], $db ['cache'] ?? false );
 		}
 	}
 	
