@@ -158,6 +158,10 @@ class SwooleWrapper extends AbstractDbWrapper {
 	public function freePool($db) {
 		$this->connectionPool->put($db);
 	}
+	public function setPool($pool) {
+		$this->connectionPool=$pool;
+	}
+
 
 }
 
