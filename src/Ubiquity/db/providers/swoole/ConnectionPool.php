@@ -42,5 +42,9 @@ class ConnectionPool{
 		}
 		return $db;
 	}
+	
+	public function getUid($value){
+		return $value.\Swoole\Coroutine::getuid();
+	}
 }
 
