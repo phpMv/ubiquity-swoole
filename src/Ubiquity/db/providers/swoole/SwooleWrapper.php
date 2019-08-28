@@ -22,11 +22,10 @@ class SwooleWrapper extends AbstractDbWrapper {
 	
 	public function __construct($dbType = 'mysql') {
 		$this->quote = '`';
-		$this->dbInstance=[];
 	}
 	
 	public function queryColumn($sql, $columnNumber = null) {
-		$stmt = $this->dbInstance[$this->uid()]->prepare($sql);
+		$stmt = $this->dbInstance->prepare($sql);
 		if($stmt->execute()){
 			$row=$stmt->fetch();
 			return (\is_numeric($columnNumber))?\array_values($row)[$columnNumber]:$row[$columnNumber];
@@ -37,33 +36,32 @@ class SwooleWrapper extends AbstractDbWrapper {
 		return 'swoole.coroutine.mysql:dbname=' . $dbName . ';host=' . $serverName . ';charset=UTF8;port=' . $port;
 	}
 	public function fetchAllColumn($statement, array $values = null, $column = null) {
-		$st=new SwooleStatement($this->dbInstance[$this->uid()],$statement);
+		$st=new SwooleStatement($this->dbInstance,$statement);
 		return $st->fetchColumn($column??0);
 	}
 
 	public function ping() {
-		return (1 === \intval ( $this->queryColumn( 'SELECT 1' ,0 ) ));
+		return ($this->dbInstance && 1 === \intval ( $this->queryColumn( 'SELECT 1' ,0 ) ));
 	}
 
 	public function commit() {
-		$uid=$this->uid();
-		$this->dbInstance[$uid]->commit();
-		$this->inTransaction[$uid] = false;
+		$this->dbInstance->commit();
+		$this->inTransaction = true;
 	}
 
 	public function prepareStatement($sql) {
-		$db=$this->dbInstance[$this->uid()];
-		return new SwooleStatement($db,$db->prepare ( $sql ));
+		$st=$this->dbInstance->prepare ( $sql );
+		return new SwooleStatement($this->dbInstance,$st);
 	}
 
 	public function queryAll($sql, $fetchStyle = null) {
-		return $this->dbInstance[$this->uid()]->query ( $sql );
+		return $this->dbInstance->query ( $sql );
 	}
 
 	public function releasePoint($level) {}
 
 	public function lastInsertId() {
-		return $this->dbInstance[$this->uid()]->insert_id;
+		return $this->dbInstance->insert_id;
 	}
 
 	public function nestable() {
@@ -81,18 +79,16 @@ class SwooleWrapper extends AbstractDbWrapper {
 	public function getStatement($sql) {
 		\preg_match_all('/:([[:alpha:]]+)/', $sql,$params);
 		$sql=\preg_replace('/:[[:alpha:]]+/','?',$sql);
-		$db=$this->dbInstance[$this->uid()];
-		return new SwooleStatement($db,$db->prepare ( $sql),$params);
+		$st=$this->dbInstance->prepare ( $sql);
+		return new SwooleStatement($this->dbInstance,$st,$params);
 	}
 
 	public function connect($dbType, $dbName, $serverName, $port, $user, $password, array $options) {
-		//$this->connectionPool=new ConnectionPool($dbType, $serverName,$port, $user, $password, $dbName);
-		$this->connectionPool=\Ubiquity\controllers\Startup::$pool;
-		//$this->dbInstance=$this->connectionPool->get();
+		$this->dbInstance=$this->connectionPool->get();
 	}
 
 	public function inTransaction() {
-		return $this->inTransaction[$this->uid()];
+		return $this->inTransaction;
 	}
 
 	public function fetchAll($statement, array $values = null, $mode = null) {
@@ -103,7 +99,7 @@ class SwooleWrapper extends AbstractDbWrapper {
 	}
 
 	public function query($sql) {
-		return $this->dbInstance[$this->uid()]->query($sql);
+		return $this->dbInstance->query($sql);
 	}
 
 	public function fetchColumn($statement, array $values = null, $columnNumber = null) {
@@ -114,9 +110,8 @@ class SwooleWrapper extends AbstractDbWrapper {
 	}
 
 	public function execute($sql) {
-		$db=$this->dbInstance[$this->uid()];
-		$db->query($sql);
-		return $db->affected_rows;
+		$this->dbInstance->query($sql);
+		return $this->dbInstance->affected_rows;
 	}
 
 	public function fetchOne($statement, array $values = null, $mode = null) {
@@ -133,17 +128,15 @@ class SwooleWrapper extends AbstractDbWrapper {
 	}
 
 	public function rollBack() {
-		$uid=$this->uid();
-		$this->dbInstance[$uid]->rollback();
-		$this->inTransaction[$uid]=false;
+		$this->dbInstance->rollback();
+		$this->inTransaction=false;
 	}
 
 	public function getForeignKeys($tableName, $pkName, $dbName = null) {}
 
 	public function beginTransaction() {
-		$uid=$this->uid();
-		$this->dbInstance[$uid]->begin();
-		$this->inTransaction[$uid]=true;
+		$this->dbInstance->begin();
+		$this->inTransaction=true;
 	}
 
 	public function statementRowCount($statement) {
@@ -159,15 +152,11 @@ class SwooleWrapper extends AbstractDbWrapper {
 	public function getPrimaryKeys($tableName) {}
 	
 	public function pool() {
-		return $this->dbInstance[$this->uid()]=$this->connectionPool->get();
+		return $this->dbInstance=$this->connectionPool->get();
 	}
 	
 	public function freePool($db) {
 		$this->connectionPool->put($db);
-	}
-	
-	private function uid(){
-		return \Swoole\Coroutine::getuid();
 	}
 
 }
