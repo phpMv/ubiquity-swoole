@@ -84,7 +84,9 @@ class SwooleWrapper extends AbstractDbWrapper {
 	}
 
 	public function connect($dbType, $dbName, $serverName, $port, $user, $password, array $options) {
-		$this->dbInstance=$this->connectionPool->get();
+		if(!isset($this->dbInstance)){
+			$this->dbInstance=$this->connectionPool->get();
+		}
 	}
 
 	public function inTransaction() {
@@ -161,7 +163,12 @@ class SwooleWrapper extends AbstractDbWrapper {
 	public function setPool($pool) {
 		$this->connectionPool=$pool;
 	}
-
-
+	public function _getStatement(string $sql) {
+		$uid = $this->connectionPool->getUid ( $sql );
+		if (! isset ( $this->statements [$uid] )) {
+			$this->statements [$uid] = $this->getStatement ( $sql );
+		}
+		return $this->statements [$uid];
+	}
 }
 
