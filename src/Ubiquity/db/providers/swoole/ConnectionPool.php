@@ -16,7 +16,6 @@ class ConnectionPool{
 	];
 	private $dbClass;
 	private $pool;
-	private $pool_count = 0;
 	
 	public function __construct($dbType,$host,$port,$user,$password,$database){
 		$this->pool = new \SplQueue;
@@ -26,21 +25,17 @@ class ConnectionPool{
 	
 	public function put($db){
 		$this->pool->enqueue($db);
-		$this->pool_count++;
 	}
 	public function get(){
-		if ($this->pool_count > 0) {
-			$this->pool_count--;
+		if (!$this->pool->isEmpty()) {
 			return $this->pool->dequeue();
 		}
-		// No idle connection, time to create a new connection
 		$clazz=$this->dbClass;
 		$db = new $clazz();
-		$db->connect($this->server);
-		if ($db == false) {
-			return false;
+		if($db->connect($this->server)){
+			return $db;
 		}
-		return $db;
+		return false;
 	}
 	
 	public function getUid($value){
