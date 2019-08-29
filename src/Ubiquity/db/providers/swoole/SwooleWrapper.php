@@ -25,7 +25,7 @@ class SwooleWrapper extends AbstractDbWrapper {
 	}
 	
 	public function queryColumn($sql, $columnNumber = null) {
-		$stmt = $this->dbInstance->prepare($sql);
+		$stmt = $this->getInstance()->prepare($sql);
 		if($stmt->execute()){
 			$row=$stmt->fetch();
 			return (\is_numeric($columnNumber))?\array_values($row)[$columnNumber]:$row[$columnNumber];
@@ -36,32 +36,33 @@ class SwooleWrapper extends AbstractDbWrapper {
 		return 'swoole.coroutine.mysql:dbname=' . $dbName . ';host=' . $serverName . ';charset=UTF8;port=' . $port;
 	}
 	public function fetchAllColumn($statement, array $values = null, $column = null) {
-		$st=new SwooleStatement($this->dbInstance,$statement);
+		$st=new SwooleStatement($this->getInstance(),$statement);
 		return $st->fetchColumn($column??0);
 	}
 
 	public function ping() {
-		return ($this->dbInstance && 1 === \intval ( $this->queryColumn( 'SELECT 1' ,0 ) ));
+		return (1 === \intval ( $this->queryColumn( 'SELECT 1' ,0 ) ));
 	}
 
 	public function commit() {
-		$this->dbInstance->commit();
+		$this->getInstance()->commit();
 		$this->inTransaction = true;
 	}
 
 	public function prepareStatement($sql) {
-		$st=$this->dbInstance->prepare ( $sql );
-		return new SwooleStatement($this->dbInstance,$st);
+		$instance=$this->getInstance();
+		$st=$instance->prepare ( $sql );
+		return new SwooleStatement($instance,$st);
 	}
 
 	public function queryAll($sql, $fetchStyle = null) {
-		return $this->dbInstance->query ( $sql );
+		return $this->getInstance()->query ( $sql );
 	}
 
 	public function releasePoint($level) {}
 
 	public function lastInsertId() {
-		return $this->dbInstance->insert_id;
+		return $this->getInstance()->insert_id;
 	}
 
 	public function nestable() {
@@ -79,11 +80,13 @@ class SwooleWrapper extends AbstractDbWrapper {
 	public function getStatement($sql) {
 		\preg_match_all('/:([[:alpha:]]+)/', $sql,$params);
 		$sql=\preg_replace('/:[[:alpha:]]+/','?',$sql);
-		$st=$this->dbInstance->prepare ( $sql);
-		return new SwooleStatement($this->dbInstance,$st,$params);
+		$instance=$this->getInstance();
+		$st=$instance->prepare ( $sql);
+		return new SwooleStatement($instance,$st,$params);
 	}
 
 	public function connect($dbType, $dbName, $serverName, $port, $user, $password, array $options) {
+		
 	}
 
 	public function inTransaction() {
@@ -98,7 +101,7 @@ class SwooleWrapper extends AbstractDbWrapper {
 	}
 
 	public function query($sql) {
-		return $this->dbInstance->query($sql);
+		return $this->getInstance()->query($sql);
 	}
 
 	public function fetchColumn($statement, array $values = null, $columnNumber = null) {
@@ -109,8 +112,9 @@ class SwooleWrapper extends AbstractDbWrapper {
 	}
 
 	public function execute($sql) {
-		$this->dbInstance->query($sql);
-		return $this->dbInstance->affected_rows;
+		$instance=$this->getInstance();
+		$instance->query($sql);
+		return $instance->affected_rows;
 	}
 
 	public function fetchOne($statement, array $values = null, $mode = null) {
@@ -127,14 +131,14 @@ class SwooleWrapper extends AbstractDbWrapper {
 	}
 
 	public function rollBack() {
-		$this->dbInstance->rollback();
+		$this->getInstance()->rollback();
 		$this->inTransaction=false;
 	}
 
 	public function getForeignKeys($tableName, $pkName, $dbName = null) {}
 
 	public function beginTransaction() {
-		$this->dbInstance->begin();
+		$this->getInstance()->begin();
 		$this->inTransaction=true;
 	}
 
@@ -151,7 +155,7 @@ class SwooleWrapper extends AbstractDbWrapper {
 	public function getPrimaryKeys($tableName) {}
 	
 	public function pool() {
-		return $this->dbInstance=$this->connectionPool->get();
+		return $this->connectionPool->get();
 	}
 	
 	public function freePool($db) {
@@ -161,11 +165,19 @@ class SwooleWrapper extends AbstractDbWrapper {
 		$this->connectionPool=$pool;
 	}
 	public function _getStatement(string $sql) {
-		$uid = $this->connectionPool->getUid ( $sql );
+		$uid = $sql.$this->getUid();
 		if (! isset ( $this->statements [$uid] )) {
 			$this->statements [$uid] = $this->getStatement ( $sql );
 		}
 		return $this->statements [$uid];
+	}
+	
+	protected function getInstance(){
+		return $this->connectionPool->get();
+	}
+	
+	protected function getUid(){
+		return \Swoole\Coroutine::getuid();
 	}
 }
 
