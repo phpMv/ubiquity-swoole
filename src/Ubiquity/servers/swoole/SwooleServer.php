@@ -108,10 +108,9 @@ class SwooleServer {
 			'enable_reuse_port' => true,
 			'enable_coroutine' => true,
 			'http_compression' => false
-			// 'daemonize' => true
 		];
-		if (is_array($options)) {
-			$this->options = $default + $options;
+		if (\is_array($options)) {
+			$this->options = \array_merge($default ,$options);
 		} else {
 			$this->options = $default;
 		}
@@ -152,12 +151,12 @@ class SwooleServer {
 	protected function handle(Request $request, Response $response) {
 		$request->get['c'] = '';
 		$response->status(200);
-		$uri = ltrim(urldecode(parse_url($request->server['request_uri'], PHP_URL_PATH)), '/');
-		if ($uri == null || ! file_exists($this->basedir . '/../' . $uri)) {
+		$uri = \ltrim(\urldecode(\parse_url($request->server['request_uri'], PHP_URL_PATH)), '/');
+		if ($uri == null || ! \file_exists($this->basedir . '/../' . $uri)) {
 			$request->get['c'] = $uri;
 		} else {
 			$response->header('Content-Type', $request->header['accept'] ?? 'text/html; charset=utf-8');
-			$response->end(file_get_contents($this->basedir . '/../' . $uri));
+			$response->end(\file_get_contents($this->basedir . '/../' . $uri));
 			return;
 		}
 
@@ -166,8 +165,7 @@ class SwooleServer {
 		\ob_start();
 		\Ubiquity\controllers\Startup::setHttpInstance($this->httpInstance);
 		\Ubiquity\controllers\Startup::run($this->config);
-		$content = ob_get_clean();
-		$response->end($content);
+		$response->end(\ob_get_clean());
 	}
 
 	protected function parseRequest(Request $request) {
@@ -179,7 +177,7 @@ class SwooleServer {
 			$headerKey = 'HTTP_' . strtoupper(str_replace('-', '_', $key));
 			$headers[$headerKey] = $value;
 		}
-		$_SERVER = array_change_key_case(array_merge($request->server, $headers), CASE_UPPER);
+		$_SERVER = \array_change_key_case(\array_merge($request->server, $headers), \CASE_UPPER);
 		$_GET = $request->get ?? [];
 		$_POST = $request->post ?? [];
 		$_COOKIE = $request->cookie ?? [];
