@@ -18,7 +18,7 @@ class ConnectionPool{
 	
 	public function __construct(&$config, $offset=null){
 		$db = $offset ? ($config ['database'] [$offset] ?? ($config ['database'] ?? [ ])) : ($config ['database'] ['default'] ?? $config ['database']);
-		$this->pool = new \SplQueue;
+		$this->pool = new \SplQueue();
 		$this->server=['host'=>$db ['serverName']??'127.0.0.1','port'=>$db ['port']??3306,'user'=>$db ['user']??'root','password'=>$db ['password']??'','database'=>$db ['dbName']??'']+$this->server;
 		//$this->dbClass=self::DB_TYPES[$db ['type']]??'Swoole\Coroutine\MySQL';
 	}
@@ -35,9 +35,9 @@ class ConnectionPool{
 			return $this->dbs[$uid]=$this->pool->dequeue();
 		}
 		//$clazz=$this->dbClass;
-		$this->dbs[$uid] = new MySQL();
-		if($this->dbs[$uid]->connect($this->server)){
-			return $this->dbs[$uid];
+		$db=$this->dbs[$uid] = new MySQL();
+		if($db->connect($this->server)){
+			return $db;
 		}
 		return false;
 	}

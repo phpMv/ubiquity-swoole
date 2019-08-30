@@ -99,6 +99,14 @@ class SwooleWrapper extends AbstractDbWrapper {
 		}
 		return false;
 	}
+	
+	public function _optPrepareAndExecute($sql,array $values=null){
+		$statement=$this->_getStatement($sql);
+		if ($statement->execute($values)){
+			return $statement->get_result();
+		}
+		return false;
+	}
 
 	public function query($sql) {
 		return $this->getInstance()->query($sql);
