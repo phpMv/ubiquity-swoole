@@ -14,8 +14,7 @@ class ConnectionPool{
 	private $dbClass;
 	private $pool;
 	
-	private $dbs=[];
-	
+
 	public function __construct(&$config, $offset=null){
 		$db = $offset ? ($config ['database'] [$offset] ?? ($config ['database'] ?? [ ])) : ($config ['database'] ['default'] ?? $config ['database']);
 		$this->pool = new \SplQueue();
@@ -27,23 +26,15 @@ class ConnectionPool{
 		$this->pool->enqueue($db);
 	}
 	public function get(){
-		$uid=\Swoole\Coroutine::getuid();
-		if(isset($this->dbs[$uid])){
-			return $this->dbs[$uid];
-		}
 		if (!$this->pool->isEmpty()) {
-			return $this->dbs[$uid]=$this->pool->dequeue();
+			return $this->pool->dequeue();
 		}
 		//$clazz=$this->dbClass;
-		$db=$this->dbs[$uid] = new MySQL();
+		$db=new MySQL();
 		if($db->connect($this->server)){
 			return $db;
 		}
 		return false;
-	}
-	
-	public function getUid($value){
-		return $value.\Swoole\Coroutine::getuid();
 	}
 }
 

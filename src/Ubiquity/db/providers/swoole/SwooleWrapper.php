@@ -2,6 +2,7 @@
 namespace Ubiquity\db\providers\swoole;
 
 use Ubiquity\db\providers\AbstractDbWrapper;
+use Swoole\Coroutine;
 
 /**
  * Ubiquity\db\providers\swoole$SwooleWrapper
@@ -19,6 +20,8 @@ class SwooleWrapper extends AbstractDbWrapper {
 	private $connectionPool;
 	
 	private $inTransaction=false;
+	
+	private $dbs=[];
 	
 	public function __construct($dbType = 'mysql') {
 		$this->quote = '`';
@@ -101,9 +104,16 @@ class SwooleWrapper extends AbstractDbWrapper {
 	}
 	
 	public function _optPrepareAndExecute($sql,array $values=null){
-		$statement=$this->_getStatement($sql);
-		if ($statement->execute($values)){
-			return $statement->get_result();
+		$uid=Coroutine::getuid();
+		if (! isset ( $this->statements [$uid] )) {
+			\preg_match_all('/:([[:alpha:]]+)/', $sql,$params);
+			$sql=\preg_replace('/:[[:alpha:]]+/','?',$sql);
+			$instance=$this->dbs[$uid];
+			$st=$instance->prepare ( $sql);
+			$this->statements [$uid]= new SwooleStatement($this->dbs[$uid],$st,$params);
+		}
+		if ($this->statements [$uid]->execute($values)){
+			return $this->statements [$uid]->get_result();
 		}
 		return false;
 	}
@@ -163,17 +173,18 @@ class SwooleWrapper extends AbstractDbWrapper {
 	public function getPrimaryKeys($tableName) {}
 	
 	public function pool() {
-		return $this->connectionPool->get();
+		return $this->dbs[Coroutine::getuid()]=$this->connectionPool->get();
 	}
 	
 	public function freePool($db) {
 		$this->connectionPool->put($db);
+		unset($this->dbs[Coroutine::getuid()]);
 	}
 	public function setPool($pool) {
 		$this->connectionPool=$pool;
 	}
 	public function _getStatement(string $sql) {
-		$uid = $sql.$this->getUid();
+		$uid = $sql.Coroutine::getuid();
 		if (! isset ( $this->statements [$uid] )) {
 			$this->statements [$uid] = $this->getStatement ( $sql );
 		}
@@ -181,11 +192,11 @@ class SwooleWrapper extends AbstractDbWrapper {
 	}
 	
 	protected function getInstance(){
-		return $this->connectionPool->get();
+		return $this->dbs[Coroutine::getuid()];
 	}
 	
 	protected function getUid(){
-		return \Swoole\Coroutine::getuid();
+		return Coroutine::getuid();
 	}
 }
 
