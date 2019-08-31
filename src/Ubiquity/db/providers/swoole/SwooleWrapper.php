@@ -104,16 +104,9 @@ class SwooleWrapper extends AbstractDbWrapper {
 	}
 	
 	public function _optPrepareAndExecute($sql,array $values=null){
-		$uid=Coroutine::getuid();
-		if (! isset ( $this->statements [$uid] )) {
-			\preg_match_all('/:([[:alpha:]]+)/', $sql,$params);
-			$sql=\preg_replace('/:[[:alpha:]]+/','?',$sql);
-			$instance=$this->dbs[$uid];
-			$st=$instance->prepare ( $sql);
-			$this->statements [$uid]= new SwooleStatement($this->dbs[$uid],$st,$params);
-		}
-		if ($this->statements [$uid]->execute($values)){
-			return $this->statements [$uid]->get_result();
+		$statement=$this->_getStatement($sql);
+		if ($statement->execute($values)){
+			return $statement->get_result();
 		}
 		return false;
 	}
