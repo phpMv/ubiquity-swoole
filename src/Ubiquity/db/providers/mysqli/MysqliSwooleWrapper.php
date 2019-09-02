@@ -7,5 +7,8 @@ use Ubiquity\db\provider\mysqli\MysqliWrapper;
 
 class MysqliSwooleWrapper extends MysqliWrapper {
 use TraitHasPool;
+	public function getPoolClass() {
+		return \Ubiquity\db\pooling\MysqliPool::class;
+	}
 }
 

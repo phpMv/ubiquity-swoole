@@ -21,6 +21,10 @@ use TraitHasPool;
 		$this->quote = '`';
 	}
 	
+	public function getPoolClass() {
+		return \Ubiquity\db\pooling\ConnectionPool::class;
+	}
+	
 	public function queryColumn($sql, $columnNumber = null) {
 		$stmt = $this->getInstance()->prepare($sql);
 		if($stmt->execute()){

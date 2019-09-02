@@ -12,6 +12,8 @@ use Swoole\Coroutine;
  */
 trait TraitHasPool {
 	
+	abstract function getPoolClass();
+	
 	abstract public function getStatement($sql);
 	/**
 	 * @var \Ubiquity\db\pooling\ConnectionPool

@@ -7,5 +7,9 @@ use Ubiquity\db\providers\tarantool\TarantoolWrapper;
 
 class TarantoolSwooleWrapper extends TarantoolWrapper {
 use TraitHasPool;
+	public function getPoolClass() {
+		return \Ubiquity\db\pooling\TarantoolPool::class;
+	}
+
 }
 
