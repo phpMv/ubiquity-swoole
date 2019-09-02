@@ -2,7 +2,7 @@
 namespace Ubiquity\db\providers\swoole;
 
 use Ubiquity\db\providers\AbstractDbWrapper;
-use Swoole\Coroutine;
+use Ubiquity\db\providers\TraitHasPool;
 
 /**
  * Ubiquity\db\providers\swoole$SwooleWrapper
@@ -13,15 +13,9 @@ use Swoole\Coroutine;
  *
  */
 class SwooleWrapper extends AbstractDbWrapper {
-	
-	/**
-	 * @var ConnectionPool
-	 */
-	private $connectionPool;
-	
+use TraitHasPool;
+
 	private $inTransaction=false;
-	
-	private $dbs=[];
 	
 	public function __construct($dbType = 'mysql') {
 		$this->quote = '`';
@@ -86,10 +80,6 @@ class SwooleWrapper extends AbstractDbWrapper {
 		$instance=$this->getInstance();
 		$st=$instance->prepare ( $sql);
 		return new SwooleStatement($instance,$st,$params);
-	}
-
-	public function connect($dbType, $dbName, $serverName, $port, $user, $password, array $options) {
-		
 	}
 
 	public function inTransaction() {
@@ -165,31 +155,5 @@ class SwooleWrapper extends AbstractDbWrapper {
 
 	public function getPrimaryKeys($tableName) {}
 	
-	public function pool() {
-		return $this->dbs[Coroutine::getuid()]=$this->connectionPool->get();
-	}
-	
-	public function freePool($db) {
-		$this->connectionPool->put($db);
-		unset($this->dbs[Coroutine::getuid()]);
-	}
-	public function setPool($pool) {
-		$this->connectionPool=$pool;
-	}
-	public function _getStatement(string $sql) {
-		$uid = $sql.Coroutine::getuid();
-		if (! isset ( $this->statements [$uid] )) {
-			$this->statements [$uid] = $this->getStatement ( $sql );
-		}
-		return $this->statements [$uid];
-	}
-	
-	protected function getInstance(){
-		return $this->dbs[Coroutine::getuid()];
-	}
-	
-	protected function getUid(){
-		return Coroutine::getuid();
-	}
 }
 
