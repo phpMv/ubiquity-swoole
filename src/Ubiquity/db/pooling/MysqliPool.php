@@ -18,7 +18,7 @@ class MysqliPool extends AbstractConnectionPool{
 		return $dbInstance;
 	}
 	
-	protected function setDbParams($dbConfig) {
+	protected function setDbParams(&$dbConfig) {
 		$this->config=$dbConfig;
 	}
 }

@@ -22,7 +22,7 @@ class ConnectionPool extends AbstractConnectionPool{
 		return false;
 	}
 	
-	protected function setDbParams($dbConfig) {
+	protected function setDbParams(&$dbConfig) {
 		$this->server=['host'=>$dbConfig ['serverName']??'127.0.0.1','port'=>$dbConfig ['port']??3306,'user'=>$dbConfig ['user']??'root','password'=>$dbConfig ['password']??'','database'=>$dbConfig ['dbName']??'']+$this->server;
 		//$this->dbClass=self::DB_TYPES[$db ['type']]??'Swoole\Coroutine\MySQL';
 	}

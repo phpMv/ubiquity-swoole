@@ -10,7 +10,7 @@ class TarantoolPool extends AbstractConnectionPool{
 		return \Tarantool\Client\Client::fromDsn ($this->dsn);
 	}
 	
-	protected function setDbParams($dbConfig) {
+	protected function setDbParams(&$dbConfig) {
 		$opts='';
 		\extract($dbConfig);
 		if($user!=null){
