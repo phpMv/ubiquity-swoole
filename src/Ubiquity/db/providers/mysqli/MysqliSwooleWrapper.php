@@ -1,5 +1,5 @@
 <?php
-namespace Ubiquity\db\providers\tarantool;
+namespace Ubiquity\db\providers\mysqli;
 
 
 use Ubiquity\db\providers\TraitHasPool;
