@@ -2,7 +2,6 @@
 namespace Ubiquity\db\pooling;
 
 use Swoole\Coroutine\Channel;
-use Swoole\Coroutine;
 
 abstract class AbstractConnectionPool{
 	
@@ -26,12 +25,6 @@ abstract class AbstractConnectionPool{
 			return $this->pool->pop();
 		}
 		return $this->createDbInstance();
-	}
-	
-	public function go(callable $asyncCall){
-		$dbInstance=$this->get();
-		Coroutine::create($asyncCall);
-		$this->put($dbInstance);
 	}
 }
 
