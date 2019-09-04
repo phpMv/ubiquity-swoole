@@ -79,7 +79,7 @@ class SwooleStatement {
 			}
 			$r = $this->statement->execute($values, $timeout ?? $this->timeout);
 			$this->resultSet = ($ok = $r !== false) ? $r : [];
-			$this->afterExecute();
+			$this->bindParams=[];
 			return $ok;
 		}
 		return false;
@@ -96,10 +96,6 @@ class SwooleStatement {
 	public function fetchColumn($columnNumber=0){
 		return \array_column(\is_numeric($columnNumber) ? $this->getBoth() : $this->resultSet,
 			$columnNumber);
-	}
-	
-	private function afterExecute(){
-		$this->preparedParams = [];
 	}
 	
 	private function getBoth(){
