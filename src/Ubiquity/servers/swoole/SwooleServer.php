@@ -22,6 +22,8 @@ class SwooleServer {
 	private $basedir;
 
 	private $options;
+	
+	private $events=[];
 
 	/**
 	 *
@@ -65,6 +67,12 @@ class SwooleServer {
 	private function configure($http) {
 		$http->set($this->options);
 	}
+	
+	private function addEvents($http){
+		foreach ($this->events as $event=>$callback) {
+			$http->on($event,$callback);
+		}
+	}
 
 	public function init($config, $basedir) {
 		$this->config = $config;
@@ -90,8 +98,8 @@ class SwooleServer {
 		$default = [
 			'daemonize' => false,
 			'dispatch_mode' => 2,
-			'reactor_num' => function_exists('swoole_cpu_num') ? swoole_cpu_num() * 2 : 4,
-			'worker_num' => function_exists('swoole_cpu_num') ? swoole_cpu_num() * 2 : 8,
+			'reactor_num' => function_exists('swoole_cpu_num') ? swoole_cpu_num() : 2,
+			'worker_num' => function_exists('swoole_cpu_num') ? swoole_cpu_num() : 4,
 			'task_ipc_mode' => 1,
 			'task_max_request' => 8000,
 			'task_tmpdir' => @is_writable('/dev/shm/') ? '/dev/shm' : '/tmp',
@@ -123,12 +131,17 @@ class SwooleServer {
 		$http->on('start', function ($server) use ($host, $port) {
 			echo "Ubiquity-Swoole http server is started at {$host}:{$port}\n";
 		});
-
+		
 		$http->on("request", function (Request $request, Response $response) {
 			$this->handle($request, $response);
 		});
+		$this->addEvents($http);
 		$this->server = $http;
 		$http->start();
+	}
+	
+	public function on($eventName,$callback){
+		$this->events=$callback;
 	}
 
 	/**

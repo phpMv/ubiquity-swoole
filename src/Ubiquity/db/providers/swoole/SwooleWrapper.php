@@ -2,27 +2,22 @@
 namespace Ubiquity\db\providers\swoole;
 
 use Ubiquity\db\providers\AbstractDbWrapper;
-use Ubiquity\db\providers\TraitHasPool;
+use Swoole\Coroutine\MySQL;
 
 /**
  * Ubiquity\db\providers\swoole$SwooleWrapper
  * This class is part of Ubiquity
  * @author jcheron <myaddressmail@gmail.com>
- * @version 1.0.0
+ * @version 1.0.1
  * @property \Swoole\Coroutine\MySQL $dbInstance
  *
  */
 class SwooleWrapper extends AbstractDbWrapper {
-use TraitHasPool;
 
 	private $inTransaction=false;
 	
 	public function __construct($dbType = 'mysql') {
 		$this->quote = '`';
-	}
-	
-	public function getPoolClass() {
-		return \Ubiquity\db\pooling\ConnectionPool::class;
 	}
 	
 	public function queryColumn($sql, $columnNumber = null) {
@@ -158,6 +153,24 @@ use TraitHasPool;
 	}
 
 	public function getPrimaryKeys($tableName) {}
+	
+	public function connect(string $dbType, $dbName, $serverName, string $port, string $user, string $password, array $options) {
+		$uid=\Swoole\Coroutine::getuid();
+		if(!isset($this->dbInstance[$uid])){
+			$db=new MySQL();
+			$server = [
+				'charset' => 'utf8mb4',
+				'timeout' => 1.000,
+				'strict_type' => true
+			];
+			$db->connect(['host'=>$serverName??'127.0.0.1','port'=>$port??3306,'user'=>$user??'root','password'=>$password??'','database'=>$dbName??'']+$server);
+			$this->dbInstance[$uid]=$db;
+		}
+	}
+
+	public function getDbInstance() {
+		return $this->dbInstance[\Swoole\Coroutine::getuid()];
+	}
 	
 }
 
