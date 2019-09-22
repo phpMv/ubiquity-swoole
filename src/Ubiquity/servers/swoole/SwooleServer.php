@@ -79,6 +79,7 @@ class SwooleServer {
 		$this->basedir = $basedir;
 		$this->httpInstance = new SwooleHttp();
 		\Ubiquity\controllers\Startup::init($config);
+		\Ubiquity\controllers\Startup::setHttpInstance($this->httpInstance);
 	}
 
 	/**
@@ -177,7 +178,6 @@ class SwooleServer {
 		$this->httpInstance->setRequest($request, $response);
 		$this->parseRequest($request);
 		\ob_start();
-		\Ubiquity\controllers\Startup::setHttpInstance($this->httpInstance);
 		\Ubiquity\controllers\Startup::forward($request->get['c']);
 		$response->end(\ob_get_clean());
 	}
