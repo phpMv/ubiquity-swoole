@@ -134,8 +134,11 @@ class SwooleServer {
 		$this->configure($http);
 		$http->on('start', function ($server) use ($host, $port) {
 			if(isset($this->servicesFile) && \file_exists($this->servicesFile)){
-				$config=$this->config;
-				include $this->servicesFile;
+				\Swoole\Runtime::enableCoroutine();
+				\Swoole\Coroutine::create(function(){
+					$config=$this->config;
+					include $this->servicesFile;
+				});
 			}
 			echo "Ubiquity-Swoole http server is started at {$host}:{$port}\n";
 		});
