@@ -24,6 +24,8 @@ class SwooleServer {
 	private $options;
 	
 	private $events=[];
+	
+	private $servicesFile;
 
 	/**
 	 *
@@ -131,6 +133,9 @@ class SwooleServer {
 		$this->setOptions($options);
 		$this->configure($http);
 		$http->on('start', function ($server) use ($host, $port) {
+			if(isset($this->servicesFile) && \file_exists($this->servicesFile)){
+				include $this->servicesFile;
+			}
 			echo "Ubiquity-Swoole http server is started at {$host}:{$port}\n";
 		});
 		
@@ -202,5 +207,12 @@ class SwooleServer {
 		$_COOKIE = $request->cookie ?? [];
 		$_FILES = $request->files ?? [];
 	}
+	/**
+	 * @param mixed $servicesFile
+	 */
+	public function setServicesFile($servicesFile) {
+		$this->servicesFile = $servicesFile;
+	}
+
 }
 
