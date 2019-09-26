@@ -139,6 +139,7 @@ class SwooleServer {
 					$config=$this->config;
 					include $this->servicesFile;
 				});
+				\Swoole\Event::wait();
 			}
 			echo "Ubiquity-Swoole http server is started at {$host}:{$port}\n";
 		});
