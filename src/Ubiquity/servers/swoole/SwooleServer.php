@@ -24,6 +24,8 @@ class SwooleServer {
 	private $options;
 	
 	private $events=[];
+	
+	private $servicesFile;
 
 	/**
 	 *
@@ -143,7 +145,7 @@ class SwooleServer {
 	}
 	
 	public function on($eventName,$callback){
-		$this->events=$callback;
+		$this->events[$eventName]=$callback;
 	}
 
 	/**
@@ -202,5 +204,12 @@ class SwooleServer {
 		$_COOKIE = $request->cookie ?? [];
 		$_FILES = $request->files ?? [];
 	}
+	/**
+	 * @param mixed $servicesFile
+	 */
+	public function setServicesFile($servicesFile) {
+		$this->servicesFile = $servicesFile;
+	}
+
 }
 
