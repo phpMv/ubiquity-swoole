@@ -3,7 +3,7 @@ namespace Ubiquity\db\pooling;
 
 
 class ConnectionPool extends AbstractConnectionPool{
-	private const DB_TYPES=['mysql'=>'\Swoole\Coroutine\MySQL','pgsql'=>'\Swoole\Coroutine\PostgreSql'];
+	private const DB_TYPES=['mysql'=>'\Swoole\Coroutine\MySQL','pgsql'=>'\Swoole\Coroutine\PostgreSQL'];
 	
 	private $server = [
 		'charset' => 'utf8mb4',
