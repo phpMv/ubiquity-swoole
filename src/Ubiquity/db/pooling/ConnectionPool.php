@@ -1,10 +1,9 @@
 <?php
 namespace Ubiquity\db\pooling;
 
-use Swoole\Coroutine\MySQL;
 
 class ConnectionPool extends AbstractConnectionPool{
-	private const DB_TYPES=['mysql'=>'Swoole\Coroutine\MySQL','postgre'=>'Swoole\Coroutine\PostgreSql'];
+	private const DB_TYPES=['mysql'=>'Swoole\Coroutine\MySQL','pgsql'=>'Swoole\Coroutine\PostgreSql'];
 	
 	private $server = [
 		'charset' => 'utf8mb4',
@@ -14,8 +13,8 @@ class ConnectionPool extends AbstractConnectionPool{
 	private $dbClass;
 	
 	protected function createDbInstance(){
-		//$clazz=$this->dbClass;
-		$db=new MySQL();
+		$clazz=$this->dbClass;
+		$db=new $clazz();
 		if($db->connect($this->server)){
 			return $db;
 		}
@@ -24,7 +23,7 @@ class ConnectionPool extends AbstractConnectionPool{
 	
 	protected function setDbParams(&$dbConfig) {
 		$this->server=['host'=>$dbConfig ['serverName']??'127.0.0.1','port'=>$dbConfig ['port']??3306,'user'=>$dbConfig ['user']??'root','password'=>$dbConfig ['password']??'','database'=>$dbConfig ['dbName']??'']+$this->server;
-		//$this->dbClass=self::DB_TYPES[$db ['type']]??'Swoole\Coroutine\MySQL';
+		$this->dbClass=self::DB_TYPES[$dbConfig ['type']]??'Swoole\Coroutine\MySQL';
 	}
 }
 
