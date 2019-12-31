@@ -22,9 +22,9 @@ class SwooleServer {
 	private $basedir;
 
 	private $options;
-	
-	private $events=[];
-	
+
+	private $events = [];
+
 	private $servicesFile;
 
 	/**
@@ -69,10 +69,10 @@ class SwooleServer {
 	private function configure($http) {
 		$http->set($this->options);
 	}
-	
-	private function addEvents($http){
-		foreach ($this->events as $event=>$callback) {
-			$http->on($event,$callback);
+
+	private function addEvents($http) {
+		foreach ($this->events as $event => $callback) {
+			$http->on($event, $callback);
 		}
 	}
 
@@ -109,7 +109,7 @@ class SwooleServer {
 			'task_tmpdir' => @is_writable('/dev/shm/') ? '/dev/shm' : '/tmp',
 			'max_request' => 8000,
 			'open_tcp_nodelay' => true,
-			'pid_file' => __DIR__ . '/server.pid',
+			'pid_file' => (@is_writable('/dev/shm/') ? '/dev/shm' : '/tmp') . '/server.pid',
 			// 'log_file' => __DIR__ . '/swoole.log',
 			'log_level' => 5,
 			'buffer_output_size' => 2 * 1024 * 1024,
@@ -122,7 +122,7 @@ class SwooleServer {
 			'http_compression' => false
 		];
 		if (\is_array($options)) {
-			$this->options = \array_merge($default ,$options);
+			$this->options = \array_merge($default, $options);
 		} else {
 			$this->options = $default;
 		}
@@ -135,7 +135,7 @@ class SwooleServer {
 		$http->on('start', function ($server) use ($host, $port) {
 			echo "Ubiquity-Swoole http server is started at {$host}:{$port}\n";
 		});
-		
+
 		$http->on("request", function (Request $request, Response $response) {
 			$this->handle($request, $response);
 		});
@@ -143,9 +143,9 @@ class SwooleServer {
 		$this->server = $http;
 		$http->start();
 	}
-	
-	public function on($eventName,$callback){
-		$this->events[$eventName]=$callback;
+
+	public function on($eventName, $callback) {
+		$this->events[$eventName] = $callback;
 	}
 
 	/**
@@ -169,15 +169,15 @@ class SwooleServer {
 		$request->get['c'] = '';
 		$response->status(200);
 		$uri = \ltrim(\urldecode(\parse_url($request->server['request_uri'], PHP_URL_PATH)), '/');
-		if ($uri == null || ! ($fe=\file_exists($this->basedir . '/../' . $uri))) {
+		if ($uri == null || ! ($fe = \file_exists($this->basedir . '/../' . $uri))) {
 			$request->get['c'] = $uri;
 		} else {
 			$response->header('Content-Type', $request->header['accept'] ?? 'text/html; charset=utf-8');
-			if($fe){
+			if ($fe) {
 				$response->end(\file_get_contents($this->basedir . '/../' . $uri));
-			}else{
+			} else {
 				$response->status(404);
-				$response->end($uri.' not found!');
+				$response->end($uri . ' not found!');
 			}
 			return;
 		}
@@ -204,12 +204,13 @@ class SwooleServer {
 		$_COOKIE = $request->cookie ?? [];
 		$_FILES = $request->files ?? [];
 	}
+
 	/**
+	 *
 	 * @param mixed $servicesFile
 	 */
 	public function setServicesFile($servicesFile) {
 		$this->servicesFile = $servicesFile;
 	}
-
 }
 
