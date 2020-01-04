@@ -24,7 +24,7 @@ class SwooleWrapper extends AbstractDbWrapper {
 	];
 
 	public function __construct($dbType = 'mysql') {
-		$this->quote = self::$quotes[$dbType];
+		$this->quote = self::$quotes[$dbType] ?? '';
 	}
 
 	public function getPoolClass() {
