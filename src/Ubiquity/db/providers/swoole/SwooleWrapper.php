@@ -7,42 +7,49 @@ use Ubiquity\db\providers\TraitHasPool;
 /**
  * Ubiquity\db\providers\swoole$SwooleWrapper
  * This class is part of Ubiquity
+ *
  * @author jcheron <myaddressmail@gmail.com>
  * @version 1.0.0
  * @property \Swoole\Coroutine\MySQL $dbInstance
  *
  */
 class SwooleWrapper extends AbstractDbWrapper {
-use TraitHasPool;
+	use TraitHasPool;
 
-	private $inTransaction=false;
-	
+	private $inTransaction = false;
+
+	private static $quotes = [
+		'mysql' => '`',
+		'pgsql' => ''
+	];
+
 	public function __construct($dbType = 'mysql') {
-		$this->quote = '`';
+		$this->quote = self::$quotes[$dbType];
 	}
-	
+
 	public function getPoolClass() {
 		return \Ubiquity\db\pooling\ConnectionPool::class;
 	}
-	
+
 	public function queryColumn($sql, $columnNumber = null) {
 		$stmt = $this->getInstance()->prepare($sql);
-		if($stmt->execute()){
-			$row=$stmt->fetch();
-			return (\is_numeric($columnNumber))?\array_values($row)[$columnNumber]:$row[$columnNumber];
+		if ($stmt->execute()) {
+			$row = $stmt->fetch();
+			return (\is_numeric($columnNumber)) ? \array_values($row)[$columnNumber] : $row[$columnNumber];
 		}
 	}
 
 	public function getDSN(string $serverName, string $port, string $dbName, string $dbType = 'mysql') {
 		return 'swoole.coroutine.mysql:dbname=' . $dbName . ';host=' . $serverName . ';charset=UTF8;port=' . $port;
 	}
+
 	public function fetchAllColumn($statement, array $values = null, $column = null) {
-		$st=new SwooleStatement($this->getInstance(),$statement);
-		return $st->fetchColumn($column??0);
+		$st = new SwooleStatement($this->getInstance(), $statement);
+		return $st->fetchColumn($column ?? 0);
 	}
 
 	public function ping() {
-		return (1 === \intval ( $this->queryColumn( 'SELECT 1' ,0 ) ));
+		return (1 === \intval($this->queryColumn('SELECT 1', 0)));
 	}
 
 	public function commit() {
@@ -51,13 +58,13 @@ use TraitHasPool;
 	}
 
 	public function prepareStatement($sql) {
-		$instance=$this->getInstance();
-		$st=$instance->prepare ( $sql );
-		return new SwooleStatement($instance,$st);
+		$instance = $this->getInstance();
+		$st = $instance->prepare($sql);
+		return new SwooleStatement($instance, $st);
 	}
 
 	public function queryAll($sql, $fetchStyle = null) {
-		return $this->getInstance()->query ( $sql );
+		return $this->getInstance()->query($sql);
 	}
 
 	public function releasePoint($level) {}
@@ -71,7 +78,9 @@ use TraitHasPool;
 	}
 
 	public static function getAvailableDrivers() {
-		return ['mysql'];
+		return [
+			'mysql'
+		];
 	}
 
 	public function rollbackPoint($level) {}
@@ -79,11 +88,11 @@ use TraitHasPool;
 	public function getTablesName() {}
 
 	public function getStatement($sql) {
-		\preg_match_all('/:([[:alpha:]]+)/', $sql,$params);
-		$sql=\preg_replace('/:[[:alpha:]]+/','?',$sql);
-		$instance=$this->getInstance();
-		$st=$instance->prepare ( $sql);
-		return new SwooleStatement($instance,$st,$params);
+		\preg_match_all('/:([[:alpha:]]+)/', $sql, $params);
+		$sql = \preg_replace('/:[[:alpha:]]+/', '?', $sql);
+		$instance = $this->getInstance();
+		$st = $instance->prepare($sql);
+		return new SwooleStatement($instance, $st, $params);
 	}
 
 	public function inTransaction() {
@@ -91,15 +100,15 @@ use TraitHasPool;
 	}
 
 	public function fetchAll($statement, array $values = null, $mode = null) {
-		if ($statement->execute($values)){
+		if ($statement->execute($values)) {
 			return $statement->get_result();
 		}
 		return false;
 	}
-	
-	public function _optPrepareAndExecute($sql,array $values=null){
-		$statement=$this->_getStatement($sql);
-		if ($statement->execute($values)){
+
+	public function _optPrepareAndExecute($sql, array $values = null) {
+		$statement = $this->_getStatement($sql);
+		if ($statement->execute($values)) {
 			return $statement->get_result();
 		}
 		return false;
@@ -110,20 +119,20 @@ use TraitHasPool;
 	}
 
 	public function fetchColumn($statement, array $values = null, $columnNumber = null) {
-		if($statement->execute()){
-			$row=$statement->fetch();
-			return (\is_numeric($columnNumber))?\array_values($row)[$columnNumber]:$row[$columnNumber];
+		if ($statement->execute()) {
+			$row = $statement->fetch();
+			return (\is_numeric($columnNumber)) ? \array_values($row)[$columnNumber] : $row[$columnNumber];
 		}
 	}
 
 	public function execute($sql) {
-		$instance=$this->getInstance();
+		$instance = $this->getInstance();
 		$instance->query($sql);
 		return $instance->affected_rows;
 	}
 
 	public function fetchOne($statement, array $values = null, $mode = null) {
-		if ($statement->execute($values)){
+		if ($statement->execute($values)) {
 			return $statement->fetch();
 		}
 		return false;
@@ -132,19 +141,19 @@ use TraitHasPool;
 	public function getFieldsInfos($tableName) {}
 
 	public function bindValueFromStatement($statement, $parameter, $value) {
-		$statement->bindValue($parameter,$value);
+		$statement->bindValue($parameter, $value);
 	}
 
 	public function rollBack() {
 		$this->getInstance()->rollback();
-		$this->inTransaction=false;
+		$this->inTransaction = false;
 	}
 
 	public function getForeignKeys($tableName, $pkName, $dbName = null) {}
 
 	public function beginTransaction() {
 		$this->getInstance()->begin();
-		$this->inTransaction=true;
+		$this->inTransaction = true;
 	}
 
 	public function statementRowCount($statement) {
@@ -154,10 +163,9 @@ use TraitHasPool;
 	public function savePoint($level) {}
 
 	public function executeStatement($statement, array $values = null) {
-		return $statement->execute ( $values );
+		return $statement->execute($values);
 	}
 
 	public function getPrimaryKeys($tableName) {}
-	
 }
 
