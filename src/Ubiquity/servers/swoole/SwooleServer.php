@@ -134,6 +134,7 @@ class SwooleServer {
 		$this->configure($http);
 		$http->on('start', function ($server) use ($host, $port) {
 			echo "Ubiquity-Swoole http server is started at {$host}:{$port}\n";
+			\var_dump(\opcache_get_status()['preload_statistics']);
 		});
 
 		$http->on("request", function (Request $request, Response $response) {
