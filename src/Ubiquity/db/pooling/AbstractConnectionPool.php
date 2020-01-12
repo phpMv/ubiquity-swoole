@@ -20,8 +20,6 @@ abstract class AbstractConnectionPool{
 			if($db!==false){
 				$this->pool->push($db);
 				$capacity--;
-			}else{
-				throw new \RuntimeException('failed to connect to DB server.');
 			}
 		}
 	}
