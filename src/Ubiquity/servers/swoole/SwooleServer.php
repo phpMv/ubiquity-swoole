@@ -185,7 +185,7 @@ class SwooleServer {
 		$this->httpInstance->setRequest($request, $response);
 		$this->parseRequest($request);
 		\ob_start();
-		\Ubiquity\controllers\Startup::forward($uri);
+		\Ubiquity\controllers\StartupAsync::forward($uri);
 		$response->end(\ob_get_clean());
 	}
 
