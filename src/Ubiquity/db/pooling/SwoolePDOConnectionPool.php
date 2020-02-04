@@ -6,7 +6,7 @@ use Swoole\Database\PDOConfig;
 
 class SwoolePDOConnectionPool extends AbstractSwoolePool {
 
-	protected function setDbParams($dbConfig) {
+	protected function setDbParams(&$dbConfig) {
 		$this->pool = new PDOPool((new PDOConfig())->withHost($dbConfig['host'])
 			->withPort($dbConfig['port'])
 			->
