@@ -14,6 +14,9 @@ abstract class AbstractSwoolePool extends AbstractConnectionPool_ {
 	public function __construct(&$config, $offset = null, int $capacity = 16) {
 		$this->capacity = $capacity;
 		parent::__construct($config, $offset, $capacity);
+		if ($capacity > 0) {
+			$this->pool->fill();
+		}
 	}
 
 	public function fill() {
@@ -25,7 +28,7 @@ abstract class AbstractSwoolePool extends AbstractConnectionPool_ {
 	}
 
 	public function get() {
-		return $this->get();
+		return $this->pool->get();
 	}
 
 	public function close(): void {
