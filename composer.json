@@ -32,6 +32,6 @@
 		}
 	},
 	"require-dev" : {
-		"swoole/ide-helper": "~4.3.3"
+		"swoole/ide-helper": "^4.4"
 	}
 }
