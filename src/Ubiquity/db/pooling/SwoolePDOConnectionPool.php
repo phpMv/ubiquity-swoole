@@ -7,14 +7,15 @@ use Swoole\Database\PDOConfig;
 class SwoolePDOConnectionPool extends AbstractSwoolePool {
 
 	protected function setDbParams(&$dbConfig) {
-		$this->pool = new PDOPool((new PDOConfig())->withHost($dbConfig['host'])
+		$this->pool = new PDOPool((new PDOConfig())->withHost($dbConfig['serverName'])
 			->withPort($dbConfig['port'])
 			->
 		// ->withUnixSocket('/tmp/mysql.sock')
 		withDbName($dbConfig['dbName'])
 			->withCharset('utf8mb4')
 			->withUsername($dbConfig['user'])
-			->withPassword($dbConfig['password']), $this->capacity);
+			->withPassword($dbConfig['password'])
+			->withOptions($dbConfig['options']), $this->capacity);
 	}
 }
 
