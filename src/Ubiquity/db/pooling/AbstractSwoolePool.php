@@ -16,6 +16,7 @@ abstract class AbstractSwoolePool extends AbstractConnectionPool_ {
 		parent::__construct($config, $offset, $capacity);
 		if ($capacity > 0) {
 			$this->pool->fill();
+			echo "Pool initialization with $capacity DB connections\n";
 		}
 	}
 
