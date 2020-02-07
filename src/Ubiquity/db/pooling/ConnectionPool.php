@@ -20,6 +20,7 @@ class ConnectionPool extends AbstractConnectionPool {
 		$clazz = $this->dbClass;
 		$db = new $clazz();
 		if ($db->connect($this->server)) {
+			echo "connection.";
 			return $db;
 		}
 		return false;
@@ -38,7 +39,7 @@ class ConnectionPool extends AbstractConnectionPool {
 			\extract($dbConfig);
 			$this->server = "host={$serverName};port={$port};dbname={$database};user={$user};password={$password}";
 		}
-		$this->dbClass = self::DB_TYPES[$dbConfig['type']] ?? '\Swoole\Coroutine\MySQL';
+		$this->dbClass = self::DB_TYPES[$dbConfig['type'] ?? 'mysql'] ?? self::DB_TYPES['mysql'];
 	}
 }
 
