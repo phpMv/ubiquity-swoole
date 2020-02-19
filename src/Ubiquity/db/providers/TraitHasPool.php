@@ -24,10 +24,8 @@ trait TraitHasPool {
 	 */
 	protected $connectionPool;
 
-	protected $dbs = [];
-
 	protected function getInstance() {
-		return $this->dbs[Coroutine::getuid()];
+		return $this->dbi;
 	}
 
 	protected function getUid() {
@@ -37,12 +35,11 @@ trait TraitHasPool {
 	public function connect($dbType, $dbName, $serverName, $port, $user, $password, array $options) {}
 
 	public function pool() {
-		return $this->dbs[Coroutine::getuid()] = $this->connectionPool->get();
+		return $this->dbi = $this->connectionPool->get();
 	}
 
 	public function freePool($db) {
 		$this->connectionPool->put($db);
-		unset($this->dbs[Coroutine::getuid()]);
 	}
 
 	public function setPool($pool) {
