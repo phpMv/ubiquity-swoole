@@ -20,7 +20,6 @@ class ConnectionPool extends AbstractConnectionPool {
 		$clazz = $this->dbClass;
 		$db = new $clazz();
 		if ($db->connect($this->server)) {
-			echo "connection.";
 			return $db;
 		}
 		return false;

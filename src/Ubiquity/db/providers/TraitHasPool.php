@@ -16,7 +16,7 @@ trait TraitHasPool {
 
 	abstract function getPoolClass();
 
-	abstract public function getStatement($sql);
+	abstract public function getStatement($sql, $dbInstance = null);
 
 	/**
 	 *
@@ -25,7 +25,7 @@ trait TraitHasPool {
 	protected $connectionPool;
 
 	protected function getInstance() {
-		return $this->dbi;
+		return $this->dbInstance;
 	}
 
 	protected function getUid() {
@@ -35,7 +35,7 @@ trait TraitHasPool {
 	public function connect($dbType, $dbName, $serverName, $port, $user, $password, array $options) {}
 
 	public function pool() {
-		return $this->dbi = $this->connectionPool->get();
+		return $this->dbInstance = $this->connectionPool->get();
 	}
 
 	public function freePool($db) {
@@ -46,8 +46,9 @@ trait TraitHasPool {
 		$this->connectionPool = $pool;
 	}
 
-	public function _getStatement(string $sql) {
-		return $this->getStatement($sql);
+	public function _getStatement(string $sql, $dbInstance = null) {
+		$key = '_st' . \md5($sql);
+		return $dbInstance->{$key} ??= $this->getStatement($sql, $dbInstance);
 	}
 }
 

@@ -32,7 +32,7 @@ class SwooleWrapper extends AbstractDbWrapper {
 	}
 
 	public function queryColumn($sql, $columnNumber = null) {
-		$stmt = $this->getInstance()->prepare($sql);
+		$stmt = $this->dbInstance->prepare($sql);
 		if ($stmt->execute()) {
 			$row = $stmt->fetch();
 			return (\is_numeric($columnNumber)) ? \array_values($row)[$columnNumber] : $row[$columnNumber];
@@ -44,7 +44,7 @@ class SwooleWrapper extends AbstractDbWrapper {
 	}
 
 	public function fetchAllColumn($statement, array $values = null, $column = null) {
-		$st = new SwooleStatement($this->getInstance(), $statement);
+		$st = new SwooleStatement($this->dbInstance, $statement);
 		return $st->fetchColumn($column ?? 0);
 	}
 
@@ -53,24 +53,24 @@ class SwooleWrapper extends AbstractDbWrapper {
 	}
 
 	public function commit() {
-		$this->getInstance()->commit();
+		$this->dbInstance->commit();
 		$this->inTransaction = true;
 	}
 
 	public function prepareStatement($sql) {
-		$instance = $this->getInstance();
+		$instance = $this->dbInstance;
 		$st = $instance->prepare($sql);
 		return new SwooleStatement($instance, $st);
 	}
 
 	public function queryAll($sql, $fetchStyle = null) {
-		return $this->getInstance()->query($sql);
+		return $this->dbInstance->query($sql);
 	}
 
 	public function releasePoint($level) {}
 
 	public function lastInsertId() {
-		return $this->getInstance()->insert_id;
+		return $this->dbInstance->insert_id;
 	}
 
 	public function nestable() {
@@ -87,10 +87,10 @@ class SwooleWrapper extends AbstractDbWrapper {
 
 	public function getTablesName() {}
 
-	public function getStatement($sql) {
+	public function getStatement($sql, $dbInstance = null) {
 		\preg_match_all('/:([[:alpha:]]+)/', $sql, $params);
 		$sql = \preg_replace('/:[[:alpha:]]+/', '?', $sql);
-		$instance = $this->getInstance();
+		$instance = $dbInstance ?? $this->dbInstance;
 		$st = $instance->prepare($sql);
 		return new SwooleStatement($instance, $st, $params);
 	}
@@ -106,8 +106,8 @@ class SwooleWrapper extends AbstractDbWrapper {
 		return false;
 	}
 
-	public function _optPrepareAndExecute($sql, array $values = null) {
-		$statement = $this->_getStatement($sql);
+	public function _optPrepareAndExecute($sql, array $values = null, $dbInstance = null) {
+		$statement = $this->_getStatement($sql, $dbInstance);
 		if ($statement->execute($values)) {
 			return $statement->get_result();
 		}
@@ -115,7 +115,7 @@ class SwooleWrapper extends AbstractDbWrapper {
 	}
 
 	public function query($sql) {
-		return $this->getInstance()->query($sql);
+		return $this->dbInstance->query($sql);
 	}
 
 	public function fetchColumn($statement, array $values = null, $columnNumber = null) {
@@ -126,7 +126,7 @@ class SwooleWrapper extends AbstractDbWrapper {
 	}
 
 	public function execute($sql) {
-		$instance = $this->getInstance();
+		$instance = $this->dbInstance;
 		$instance->query($sql);
 		return $instance->affected_rows;
 	}
@@ -145,14 +145,14 @@ class SwooleWrapper extends AbstractDbWrapper {
 	}
 
 	public function rollBack() {
-		$this->getInstance()->rollback();
+		$this->dbInstance->rollback();
 		$this->inTransaction = false;
 	}
 
 	public function getForeignKeys($tableName, $pkName, $dbName = null) {}
 
 	public function beginTransaction() {
-		$this->getInstance()->begin();
+		$this->dbInstance->begin();
 		$this->inTransaction = true;
 	}
 
