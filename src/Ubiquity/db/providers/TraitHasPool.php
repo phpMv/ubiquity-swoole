@@ -47,9 +47,9 @@ trait TraitHasPool {
 	}
 
 	public function _getStatement(string $sql, $dbInstance = null) {
-		// $key = '_st' . \md5($sql);
-		// return $this->dbInstance->{$key} ??= $this->getStatement($sql, $dbInstance);
-		return $this->getStatement($sql, $dbInstance);
+		$key = '_st' . \md5($sql);
+		$instance = $dbInstance ?? $this->dbInstance;
+		return $instance->{$key} ??= $this->getStatement($sql, $instance);
 	}
 }
 
