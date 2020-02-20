@@ -42,6 +42,10 @@ trait TraitHasPool {
 		$this->connectionPool->put($db);
 	}
 
+	public function initPool() {
+		$this->connectionPool->init();
+	}
+
 	public function setPool($pool) {
 		$this->connectionPool = $pool;
 	}
