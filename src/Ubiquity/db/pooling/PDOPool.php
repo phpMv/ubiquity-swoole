@@ -8,7 +8,7 @@ class PDOPool extends AbstractConnectionPool {
 	protected function createDbInstance() {
 		$options[\PDO::ATTR_ERRMODE] = \PDO::ERRMODE_EXCEPTION;
 		extract($this->config);
-		$dbInstance = new \PDO($this->getDSN($serverName, $port, $dbName, $dbType), $user, $password, $options);
+		$dbInstance = new \PDO($this->getDSN($serverName, $port, $dbName, $type), $user, $password, $options);
 		return $dbInstance;
 	}
 
