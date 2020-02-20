@@ -7,7 +7,7 @@ abstract class AbstractConnectionPool {
 
 	protected $pool;
 
-	protected $capactity;
+	protected $capacity;
 
 	abstract protected function createDbInstance();
 
@@ -16,11 +16,12 @@ abstract class AbstractConnectionPool {
 	public function __construct(&$config, $offset = null, int $capacity = 16) {
 		$db = $offset ? ($config['database'][$offset] ?? ($config['database'] ?? [])) : ($config['database']['default'] ?? $config['database']);
 		$this->setDbParams($db);
+		$this->capacity = $capacity;
 	}
 
 	public function init() {
-		$this->pool = new Channel($this->capactity);
-		$capacity = $this->capactity;
+		$this->pool = new Channel($this->capacity);
+		$capacity = $this->capacity;
 		while ($capacity > 0) {
 			$db = $this->createDbInstance();
 			if ($db !== false) {
