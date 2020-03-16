@@ -69,7 +69,7 @@ class SwooleWrapper extends AbstractDbWrapper {
 
 	public function releasePoint($level) {}
 
-	public function lastInsertId() {
+	public function lastInsertId($name = null) {
 		return $this->getInstance()->insert_id;
 	}
 
