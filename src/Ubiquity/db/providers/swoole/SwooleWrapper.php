@@ -167,5 +167,9 @@ class SwooleWrapper extends AbstractDbWrapper {
 	}
 
 	public function getPrimaryKeys($tableName) {}
+
+	public function getRowNum(string $tableName, string $pkName, string $condition): int {}
+
+	public function groupConcat(string $fields, string $separator): string {}
 }
 
