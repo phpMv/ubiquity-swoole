@@ -129,7 +129,7 @@ class SwooleServer {
 	}
 
 	public function run($host, $port, $options = null) {
-		$http = new Server($host, $port);
+		$http = new Server($host, $port, \SWOOLE_BASE);
 		$this->setOptions($options);
 		$this->configure($http);
 		$http->on('start', function ($server) use ($host, $port) {
