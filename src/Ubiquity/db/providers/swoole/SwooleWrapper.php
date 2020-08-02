@@ -117,6 +117,17 @@ class SwooleWrapper extends AbstractDbWrapper {
 		}
 		return false;
 	}
+	
+	public function _optExecuteAndFetch($statement, array $values = null, $one = false) {
+		if ($statement->execute($values)) {
+			$res= $statement->get_result();
+			if($one){
+				return \current($res);
+			}
+			return $res;
+		}
+		return false;
+	}
 
 	public function query($sql) {
 		return $this->getInstance()->query($sql);

@@ -23,7 +23,7 @@ trait TraitHasPool {
 	protected $dbs=[];
 
 	protected function getInstance(){
-		return $this->dbs[Coroutine::getuid()];
+		return $this->dbs[Coroutine::getuid()]??$this->connectionPool->get();
 	}
 	
 	protected function getUid(){
