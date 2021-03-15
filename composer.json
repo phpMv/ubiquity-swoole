@@ -11,8 +11,7 @@
 		"swoole"
 	],
 	"require" : {
-		"php" : ">7.0",
-		"upscale/swoole-session": "^1.0"
+		"php" : ">=7.1"
 	},
 	"license" : "Apache-2.0",
 	"authors" : [{
