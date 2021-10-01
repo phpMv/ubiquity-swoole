@@ -91,7 +91,7 @@ class SwooleServer {
 	 * @return mixed
 	 */
 	public function getOption(string $key) {
-		$option = $this->options[$key];
+		$option = $this->options[$key]??false;
 		if (! $option) {
 			throw new \InvalidArgumentException(sprintf('Parameter not found: %s', $key));
 		}
@@ -129,7 +129,7 @@ class SwooleServer {
 	}
 
 	public function run($host, $port, $options = null) {
-		$http = new Server($host, $port);
+	    $http = new Server($host, $port,\SWOOLE_BASE, \SWOOLE_SOCK_TCP);
 		$this->setOptions($options);
 		$this->configure($http);
 		$http->on('start', function ($server) use ($host, $port) {
