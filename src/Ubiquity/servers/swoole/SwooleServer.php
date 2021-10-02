@@ -9,6 +9,8 @@ use Swoole\Process;
 
 class SwooleServer {
 
+    private $mode;
+    
 	private $server;
 
 	/**
@@ -75,6 +77,10 @@ class SwooleServer {
 			$http->on($event, $callback);
 		}
 	}
+	
+	public function __construct($mode=\SWOOLE_BASE){
+	    $this->mode=$mode;
+	}
 
 	public function init($config, $basedir) {
 		$this->config = $config;
@@ -129,7 +135,7 @@ class SwooleServer {
 	}
 
 	public function run($host, $port, $options = null) {
-	    $http = new Server($host, $port,\SWOOLE_BASE, \SWOOLE_SOCK_TCP);
+	    $http = new Server($host, $port,$this->mode, \SWOOLE_SOCK_TCP);
 		$this->setOptions($options);
 		$this->configure($http);
 		$http->on('start', function ($server) use ($host, $port) {
@@ -195,7 +201,7 @@ class SwooleServer {
 			if ($key == 'x-forwarded-proto' && $value == 'https') {
 				$request->server['HTTPS'] = 'on';
 			}
-			$headerKey = 'HTTP_' . strtoupper(str_replace('-', '_', $key));
+			$headerKey = 'HTTP_' . \strtoupper(\str_replace('-', '_', $key));
 			$headers[$headerKey] = $value;
 		}
 		$_SERVER = \array_change_key_case(\array_merge($request->server, $headers), \CASE_UPPER);
