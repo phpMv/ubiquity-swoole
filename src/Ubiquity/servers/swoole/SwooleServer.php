@@ -9,8 +9,8 @@ use Swoole\Process;
 
 class SwooleServer {
 
-    private $mode;
-    
+	private $mode;
+
 	private $server;
 
 	/**
@@ -77,9 +77,9 @@ class SwooleServer {
 			$http->on($event, $callback);
 		}
 	}
-	
-	public function __construct($mode=\SWOOLE_BASE){
-	    $this->mode=$mode;
+
+	public function __construct($mode = \SWOOLE_BASE) {
+		$this->mode = $mode;
 	}
 
 	public function init($config, $basedir) {
@@ -97,7 +97,7 @@ class SwooleServer {
 	 * @return mixed
 	 */
 	public function getOption(string $key) {
-		$option = $this->options[$key]??false;
+		$option = $this->options[$key] ?? false;
 		if (! $option) {
 			throw new \InvalidArgumentException(sprintf('Parameter not found: %s', $key));
 		}
@@ -111,7 +111,7 @@ class SwooleServer {
 			'worker_num' => function_exists('swoole_cpu_num') ? swoole_cpu_num() : 4,
 			'log_level' => 5,
 			'enable_reuse_port' => true,
-			'enable_coroutine' => false,
+			'enable_coroutine' => false
 		];
 		if (\is_array($options)) {
 			$this->options = \array_merge($default, $options);
@@ -121,7 +121,7 @@ class SwooleServer {
 	}
 
 	public function run($host, $port, $options = null) {
-	    $http = new Server($host, $port,$this->mode, \SWOOLE_SOCK_TCP);
+		$http = new Server($host, $port, $this->mode, \SWOOLE_SOCK_TCP);
 		$this->setOptions($options);
 		$this->configure($http);
 		$http->on('start', function ($server) use ($host, $port) {
@@ -160,12 +160,13 @@ class SwooleServer {
 	protected function handle(Request $request, Response $response) {
 		$request->get['c'] = '';
 		$response->status(200);
-		$uri = \ltrim(\urldecode(\parse_url($request->server['request_uri'], PHP_URL_PATH)), '/');
-		if ($uri == null || ! ($fe = \file_exists($this->basedir . '/../' . $uri))) {
+		$uriInfos = \Ubiquity\utils\http\URequest::parseURI($this->basedir);
+		$uri = $uriInfos['uri'];
+		if ($uriInfos['isAction']) {
 			$request->get['c'] = $uri;
 		} else {
 			$response->header('Content-Type', $request->header['accept'] ?? 'text/html; charset=utf-8');
-			if ($fe) {
+			if ($uriInfos['file']) {
 				$response->end(\file_get_contents($this->basedir . '/../' . $uri));
 			} else {
 				$response->status(404);
