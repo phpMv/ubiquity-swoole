@@ -160,8 +160,7 @@ class SwooleServer {
 	protected function handle(Request $request, Response $response) {
 		$request->get['c'] = '';
 		$response->status(200);
-		$_SERVER['REQUEST_URI'] = $request->server['request_uri'];
-		$uriInfos = \Ubiquity\utils\http\URequest::parseURI($this->basedir);
+		$uriInfos = \Ubiquity\utils\http\URequest::parseURI($request->server['request_uri'], $this->basedir);
 		$uri = $uriInfos['uri'];
 		if ($uriInfos['isAction']) {
 			$request->get['c'] = $uri;
