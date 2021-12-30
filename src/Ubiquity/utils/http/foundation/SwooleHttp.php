@@ -7,8 +7,8 @@ namespace Ubiquity\utils\http\foundation;
  * This class is part of Ubiquity
  *
  * @author jcheron <myaddressmail@gmail.com>
- * @version 1.0.0
- *         
+ * @version 1.0.1
+ *
  */
 class SwooleHttp extends AbstractHttp {
 
@@ -32,9 +32,9 @@ class SwooleHttp extends AbstractHttp {
 		return $this->headers;
 	}
 
-	public function header($key, $value, bool $replace = true, int $http_response_code = null) {
+	public function header($key, $value, bool $replace = true, int $http_response_code = 0) {
 		$this->headers[$key] = $value;
-		if ($http_response_code != null) {
+		if ($http_response_code != 0) {
 			$this->responseCode = $http_response_code;
 			$this->response->status($http_response_code);
 		}
@@ -84,8 +84,8 @@ class SwooleHttp extends AbstractHttp {
 	}
 
 	private function getFirstValue($elements) {
-		if (is_array($elements)) {
-			return current($elements);
+		if (\is_array($elements)) {
+			return \current($elements);
 		}
 		return $elements;
 	}
@@ -102,7 +102,7 @@ class SwooleHttp extends AbstractHttp {
 			'Content-Type' => 'text/html; charset=utf-8',
 			'Server' => $request->request['server'] ?? 'Swoole'
 		];
-		if (is_array($response->header)) {
+		if (\is_array($response->header)) {
 			$headers = (array_merge($default, $response->header));
 		} else {
 			$headers = $default;
