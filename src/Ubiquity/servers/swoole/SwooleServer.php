@@ -5,6 +5,7 @@ use Swoole\Http\Server;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Ubiquity\utils\http\foundation\SwooleHttp;
+use Ubiquity\utils\base\MimeType;
 use Swoole\Process;
 
 class SwooleServer {
@@ -165,11 +166,13 @@ class SwooleServer {
 		if ($uriInfos['isAction']) {
 			$request->get['c'] = $uri;
 		} else {
-			$response->header('Content-Type', $request->header['accept'] ?? 'text/html; charset=utf-8');
 			if ($uriInfos['file']) {
+				$mime = MimeType::getFileMimeType(\realpath($uri));
+				$response->header('Content-Type', $mime . '; charset=utf-8');
 				$response->end(\file_get_contents($this->basedir . '/../' . $uri));
 			} else {
 				$response->status(404);
+				$response->header('Content-Type', 'text/plain; charset=utf-8');
 				$response->end($uri . ' not found!');
 			}
 			return;
