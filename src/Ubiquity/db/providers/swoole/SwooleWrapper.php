@@ -9,7 +9,7 @@ use Ubiquity\db\providers\TraitHasPool;
  * This class is part of Ubiquity
  *
  * @author jcheron <myaddressmail@gmail.com>
- * @version 1.0.0
+ * @version 1.0.1
  * @property \Swoole\Coroutine\MySQL $dbInstance
  *
  */
@@ -31,7 +31,7 @@ class SwooleWrapper extends AbstractDbWrapper {
 		return \Ubiquity\db\pooling\ConnectionPool::class;
 	}
 
-	public function queryColumn($sql, $columnNumber = null) {
+	public function queryColumn(string $sql, int $columnNumber = null) {
 		$stmt = $this->getInstance()->prepare($sql);
 		if ($stmt->execute()) {
 			$row = $stmt->fetch();
@@ -43,7 +43,7 @@ class SwooleWrapper extends AbstractDbWrapper {
 		return 'swoole.coroutine.mysql:dbname=' . $dbName . ';host=' . $serverName . ';charset=UTF8;port=' . $port;
 	}
 
-	public function fetchAllColumn($statement, array $values = null, $column = null) {
+	public function fetchAllColumn($statement, array $values = null, string $column = null) {
 		$st = new SwooleStatement($this->getInstance(), $statement);
 		return $st->fetchColumn($column ?? 0);
 	}
@@ -57,13 +57,13 @@ class SwooleWrapper extends AbstractDbWrapper {
 		$this->inTransaction = true;
 	}
 
-	public function prepareStatement($sql) {
+	public function prepareStatement(string $sql) {
 		$instance = $this->getInstance();
 		$st = $instance->prepare($sql);
 		return new SwooleStatement($instance, $st);
 	}
 
-	public function queryAll($sql, $fetchStyle = null) {
+	public function queryAll(string $sql, int $fetchStyle = null) {
 		return $this->getInstance()->query($sql);
 	}
 
@@ -87,7 +87,7 @@ class SwooleWrapper extends AbstractDbWrapper {
 
 	public function getTablesName() {}
 
-	public function getStatement($sql) {
+	public function getStatement(string $sql) {
 		\preg_match_all('/:([[:alpha:]]+)/', $sql, $params);
 		$sql = \preg_replace('/:[[:alpha:]]+/', '?', $sql);
 		$instance = $this->getInstance();
@@ -133,14 +133,14 @@ class SwooleWrapper extends AbstractDbWrapper {
 		return $this->getInstance()->query($sql);
 	}
 
-	public function fetchColumn($statement, array $values = null, $columnNumber = null) {
+	public function fetchColumn($statement, array $values = null, int $columnNumber = null) {
 		if ($statement->execute()) {
 			$row = $statement->fetch();
 			return (\is_numeric($columnNumber)) ? \array_values($row)[$columnNumber] : $row[$columnNumber];
 		}
 	}
 
-	public function execute($sql) {
+	public function execute(string $sql) {
 		$instance = $this->getInstance();
 		$instance->query($sql);
 		return $instance->affected_rows;
