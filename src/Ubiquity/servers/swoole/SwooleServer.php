@@ -167,9 +167,10 @@ class SwooleServer {
 			$request->get['c'] = $uri;
 		} else {
 			if ($uriInfos['file']) {
-				$mime = MimeType::getFileMimeType(\realpath($uri));
+				$file=$this->basedir .'/'. $uri;
+				$mime = MimeType::getFileMimeType($file);
 				$response->header('Content-Type', $mime . '; charset=utf-8');
-				$response->end(\file_get_contents($this->basedir . '/../' . $uri));
+				$response->end(\file_get_contents($file));
 			} else {
 				$response->status(404);
 				$response->header('Content-Type', 'text/plain; charset=utf-8');
@@ -209,4 +210,3 @@ class SwooleServer {
 		$this->servicesFile = $servicesFile;
 	}
 }
-
